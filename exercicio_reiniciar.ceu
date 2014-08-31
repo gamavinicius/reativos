@@ -2,7 +2,6 @@ input  int PIN02, PIN03;
 output int  PIN13;
 
 var int dt = 1000;
-var int led_st = _LOW;
 loop do
   par/or do
       loop do
@@ -13,7 +12,6 @@ loop do
       end
   with
       loop do
-          led_st = ~led_st;
           var int pin = await PIN02
                         until pin;
           await 50ms;
@@ -56,11 +54,30 @@ loop do
   end
 
   loop do
-    var int pin0 = await PIN02
-                   until pin0;
-    await 5000ms;
-    var int pin1 = await PIN02;
-    if pin1 == _LOW then
+    var bool waiting? = false;
+    var bool finish? = false;
+
+    par/or do
+      loop do
+        var int pin0 = await PIN02
+                       until pin0;
+        waiting? = true;
+        await 5000ms;
+        waiting? = false;
+        finish? = true;
+        break;
+      end
+    with
+      loop do
+        await 50ms;
+        if waiting? then
+          await PIN02;
+          break;
+        end
+      end
+    end
+
+    if finish? then
       break;
     end
   end
