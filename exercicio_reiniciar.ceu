@@ -1,0 +1,67 @@
+input  int PIN02, PIN03;
+output int  PIN13;
+
+var int dt = 1000;
+var int led_st = _LOW;
+loop do
+  par/or do
+      loop do
+          emit PIN13 => _HIGH;
+          await (dt)ms;
+          emit PIN13 => _LOW;
+          await (dt)ms;
+      end
+  with
+      loop do
+          led_st = ~led_st;
+          var int pin = await PIN02
+                        until pin;
+          await 50ms;
+          if dt > 200 then
+            dt = dt - 100;
+          end
+      end
+  with
+      loop do
+          var int pin = await PIN03
+                        until pin;
+          await 50ms;
+          dt = dt + 100;
+      end
+  with
+      loop do
+          par/or do
+              var int pin0 = await PIN02
+                             until pin0;
+              var int pin1 = await PIN03
+                             until pin1;
+              break;
+          with
+              var int pin0 = await PIN03
+                             until pin0;
+              var int pin1 = await PIN02
+                             until pin1;
+              break;
+          with
+              par/or do
+                  var int pin = await PIN02
+                                until pin;
+              with
+                  var int pin = await PIN03
+                                until pin;
+              end
+              await 500ms;
+          end
+      end
+  end
+
+  loop do
+    var int pin0 = await PIN02
+                   until pin0;
+    await 5000ms;
+    var int pin1 = await PIN02;
+    if pin1 == _LOW then
+      break;
+    end
+  end
+end
