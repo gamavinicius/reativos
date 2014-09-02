@@ -40,22 +40,44 @@ var _SDL_Rect r2;
 par/or do
     await SDL_QUIT;
 with
+    var int i = 0;
     loop do
       par/or do
           loop do
-              loop i in 100 do
+              loop do
+                  if i >= 100 then
+                    break;
+                  end
+                  i = i + 1;
+
                   await 10ms;
                   r1.x = r1.x + 1;
               end
-              loop i in 100 do
+              loop do
+                  if i >= 200 then
+                    break;
+                  end
+                  i = i + 1;
+
                   await 10ms;
                   r1.y = r1.y + 1;
               end
-              loop i in 100 do
+              loop do
+                  if i >= 300 then
+                    break;
+                  end
+                  i = i + 1;
+
                   await 10ms;
                   r1.x = r1.x - 1;
               end
-              loop i in 100 do
+              loop do
+                  if i >= 400 then
+                    i = 0;
+                    break;
+                  end
+                  i = i + 1;
+
                   await 10ms;
                   r1.y = r1.y - 1;
               end
@@ -65,30 +87,50 @@ with
           but = await SDL_MOUSEBUTTONDOWN
                 until _SDL_Rect_vs_Mouse(&r1, but);
       end
-      loop do
-        var _SDL_MouseButtonEvent* but;
-        but = await SDL_MOUSEBUTTONDOWN
-              until _SDL_Rect_vs_Mouse(&r1, but);
-        break;
-      end
+      
+      var _SDL_MouseButtonEvent* but;
+      but = await SDL_MOUSEBUTTONDOWN
+            until _SDL_Rect_vs_Mouse(&r1, but);
     end
 with
+    var int i = 0;
     loop do
       par/or do
           loop do
-              loop i in 100 do
+              loop do
+                  if i >= 100 then
+                    break;
+                  end
+                  i = i + 1;
+
                   await 15ms;
                   r2.x = r2.x + 1;
               end
-              loop i in 100 do
+              loop do
+                  if i >= 200 then
+                    break;
+                  end
+                  i = i + 1;
+
                   await 15ms;
                   r2.y = r2.y + 1;
               end
-              loop i in 100 do
+              loop do
+                  if i >= 300 then
+                    break;
+                  end
+                  i = i + 1;
+
                   await 15ms;
                   r2.x = r2.x - 1;
               end
-              loop i in 100 do
+              loop do
+                  if i >= 400 then
+                    i = 0;
+                    break;
+                  end
+                  i = i + 1;
+
                   await 15ms;
                   r2.y = r2.y - 1;
               end
@@ -98,12 +140,10 @@ with
           but = await SDL_MOUSEBUTTONDOWN
                 until _SDL_Rect_vs_Mouse(&r2, but);
       end
-      loop do
-        var _SDL_MouseButtonEvent* but;
-        but = await SDL_MOUSEBUTTONDOWN
-              until _SDL_Rect_vs_Mouse(&r2, but);
-        break;
-      end
+      
+      var _SDL_MouseButtonEvent* but;
+      but = await SDL_MOUSEBUTTONDOWN
+            until _SDL_Rect_vs_Mouse(&r2, but);
     end
 with
     loop do
