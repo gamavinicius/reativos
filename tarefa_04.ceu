@@ -1,0 +1,213 @@
+#include "sdl.ceu"
+input void SDL_REDRAW;
+input void SDL_QUIT;
+input _SDL_KeyboardEvent* SDL_KEYDOWN;
+var _SDL_Window* win;
+finalize
+  win = _SDL_CreateWindow("Pong", 0, 0, 640, 480, _SDL_WINDOW_SHOWN);
+with
+  _SDL_DestroyWindow(win);
+end
+native do
+  SDL_Renderer* REN = NULL;
+end
+finalize
+  _REN = _SDL_CreateRenderer(win, -1, 0);
+with
+  _SDL_DestroyRenderer(_REN);
+end
+native do
+  int SCORE_P1 = 0;
+  int SCORE_P2 = 0;
+  int CHANGED_SCORE = 2;
+end
+_TTF_Init();
+finalize with
+  _TTF_Quit();
+end
+var _TTF_Font[] fnt;
+finalize
+  fnt = _TTF_OpenFont("Deutsch.ttf", 40);
+with
+  _TTF_CloseFont(fnt);
+end
+_srand(_time(null));
+class Ball with
+  var _SDL_Rect m_rect;
+  var _SDL_Rect[] m_p1;
+  var _SDL_Rect[] m_p2;
+  var int m_dt;
+  var int m_dx;
+  var int m_dy;
+do
+  m_rect.w = 10;
+  m_rect.h = 10;
+  m_rect.x = 640/2 - m_rect.w/2;
+  m_rect.y = 480/2 - m_rect.h/2;
+  loop do
+    par/or do
+      loop do //player collision detection
+        await (m_dt)ms;
+        if _SDL_HasIntersection(&m_rect, m_p1) or _SDL_HasIntersection(&m_rect, m_p2) then
+          m_dx = -m_dx;
+        end
+      end
+    with  //velocity up
+      loop do // not good solution
+        await 5000ms;
+        if m_dx > 0 then
+          m_dx = m_dx + 1;
+        else
+          m_dx = m_dx - 1;
+        end
+        if m_dy > 0 then
+          m_dy = m_dy + 1;
+        else
+          m_dy = m_dy - 1;
+        end
+      end
+    with //verify score and move
+      loop do
+        await (m_dt)ms;
+        if (m_rect.x + m_rect.w) > 640 then
+          _SCORE_P1 = _SCORE_P1 + 1;
+          break;
+        end
+        if (m_rect.x <= 0) then
+          _SCORE_P2 = _SCORE_P2 + 1;
+          break;
+        end
+        if (m_rect.y + m_rect.h) > 480 or (m_rect.y <= 0)then
+          m_dy = -m_dy;
+        end
+        m_rect.x = m_rect.x + m_dx;
+        m_rect.y = m_rect.y + m_dy;
+      end
+    with  //redesenho
+      loop do
+        await SDL_REDRAW;
+        _SDL_SetRenderDrawColor(_REN, 0x00,0x00,0x00,0x00);
+        _SDL_RenderFillRect(_REN, &m_rect);
+      end
+    end
+    _CHANGED_SCORE = 2;
+    m_rect.x = 640/2 - m_rect.w/2;
+    m_rect.y = 480/2 - m_rect.h/2;
+    m_dx = -2 + (_rand()%5);
+    m_dy = -2 + (_rand()%5);
+    if m_dx == 0 then
+      m_dx = 1;
+    end
+    if m_dy == 0 then
+      m_dy = 1;
+    end
+  end
+end
+class Player with
+  var int m_id;
+  var _SDL_Rect m_rect;
+  var _TTF_Font[] m_font;
+  var _SDL_Rect m_score_position;
+  var _SDL_Texture[] m_score_texture;
+  var _SDL_Color m_score_color;
+  var int m_dy;
+  var int m_up;
+  var int m_down;
+do
+  m_rect.w = 50;
+  m_rect.h = 50;
+  m_score_position.w = 40;
+  m_score_position.h = 40;
+  m_score_position.y = 0;
+  m_score_color.r = 255;
+  m_score_color.g = 0;
+  m_score_color.b = 0;
+  m_dy = 16;
+  par do
+    loop do  //moving
+      var _SDL_KeyboardEvent* key;
+      every key in SDL_KEYDOWN do
+        if key:keysym.sym == m_up and m_rect.y > 0 then
+          m_rect.y = m_rect.y - m_dy;  
+        else/if key:keysym.sym == m_down and (m_rect.y + m_rect.h) <= 480 then
+          m_rect.y = m_rect.y + m_dy;
+        end
+      end
+    end
+  with  //redraw
+    loop do
+      await SDL_REDRAW;
+      _SDL_SetRenderDrawColor(_REN, 0x00,0x00,0xFF,0x00);
+      _SDL_RenderFillRect(_REN, &m_rect);
+      if _CHANGED_SCORE then //avoid load texture every frame (expensive)
+        var char[5] text;
+        var _SDL_Surface[] sfc;
+        if m_id == 1 then
+          _sprintf(text, "%d", _SCORE_P1);
+        else
+          _sprintf(text, "%d", _SCORE_P2);
+        end
+        finalize
+          sfc = _TTF_RenderText_Blended(m_font, text, m_score_color);
+        with
+          _SDL_FreeSurface(sfc);
+        end
+        finalize
+          m_score_texture = _SDL_CreateTextureFromSurface(_REN, sfc);
+        with
+          _SDL_DestroyTexture(m_score_texture);
+        end
+        _CHANGED_SCORE = _CHANGED_SCORE - 1;
+      end
+      _SDL_RenderCopy(_REN, m_score_texture, null, &m_score_position);
+    end
+  end
+end
+par/or do
+  loop do  //background
+    await SDL_REDRAW;
+    _SDL_SetRenderDrawColor(_REN, 0xFF,0xFF,0xFF,0x00);
+    _SDL_RenderFillRect(_REN, null);
+  end
+with  //scenario creation
+  var Player pl1 with
+    this.m_id = 1;
+    this.m_rect.x = 0;
+    this.m_rect.y = 480/2;
+    this.m_font = fnt;
+    this.m_score_position.x = 480/2 - 20;
+    this.m_up = _SDLK_w;
+    this.m_down = _SDLK_s;
+  end;
+  var Player pl2 with
+    this.m_id = 2;
+    this.m_rect.x = 640 - 50;
+    this.m_rect.y = 480/2;
+    this.m_font = fnt;
+    this.m_score_position.x = 480/2 + 80;
+    this.m_up = _SDLK_UP;
+    this.m_down = _SDLK_DOWN;
+  end;
+  var Ball ball with
+    this.m_p1 = &pl1.m_rect;
+    this.m_p2 = &pl2.m_rect;
+    this.m_dt = 10;
+    this.m_dx = -2 + (_rand()%5);
+    this.m_dy = -2 + (_rand()%5);
+    if this.m_dx == 0 then
+      this.m_dx = 1;
+    end
+    if this.m_dy == 0 then
+      this.m_dy = 1;
+    end
+  end;
+  await FOREVER;
+with  //redraw end
+  loop do
+    await SDL_REDRAW;
+    _SDL_RenderPresent(_REN);
+  end
+with
+  await SDL_QUIT;
+end
+escape 0;
