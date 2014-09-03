@@ -180,7 +180,7 @@ with  //scenario creation
   var Player pl1 with
     this.m_id = 1;
     this.m_rect.x = 0;
-    this.m_rect.y = 480/2;
+    this.m_rect.y = 480/2 - 45;
     this.m_font = fnt;
     this.m_score_position.x = 480/2 - 20;
     this.m_up = _SDLK_w;
@@ -189,7 +189,7 @@ with  //scenario creation
   var Player pl2 with
     this.m_id = 2;
     this.m_rect.x = 640 - 30;
-    this.m_rect.y = 480/2;
+    this.m_rect.y = 480/2 - 45;
     this.m_font = fnt;
     this.m_score_position.x = 480/2 + 140;
     this.m_up = _SDLK_UP;
