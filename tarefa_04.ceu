@@ -31,6 +31,12 @@ finalize
 with
   _TTF_CloseFont(fnt);
 end
+var _SDL_Texture* tex;
+finalize
+  tex = _IMG_LoadTexture(_REN, "table.png");
+with
+  _SDL_DestroyTexture(tex);
+end
 _srand(_time(null));
 class Ball with
   var _SDL_Rect m_rect;
@@ -114,8 +120,8 @@ class Player with
   var int m_up;
   var int m_down;
 do
-  m_rect.w = 50;
-  m_rect.h = 50;
+  m_rect.w = 30;
+  m_rect.h = 90;
   m_score_position.w = 40;
   m_score_position.h = 40;
   m_score_position.y = 0;
@@ -166,8 +172,9 @@ end
 par/or do
   loop do  //background
     await SDL_REDRAW;
-    _SDL_SetRenderDrawColor(_REN, 0xFF,0xFF,0xFF,0x00);
+    _SDL_SetRenderDrawColor(_REN, 255, 255, 255, 0);
     _SDL_RenderFillRect(_REN, null);
+    _SDL_RenderCopy(_REN, tex, null, null);
   end
 with  //scenario creation
   var Player pl1 with
@@ -181,10 +188,10 @@ with  //scenario creation
   end;
   var Player pl2 with
     this.m_id = 2;
-    this.m_rect.x = 640 - 50;
+    this.m_rect.x = 640 - 30;
     this.m_rect.y = 480/2;
     this.m_font = fnt;
-    this.m_score_position.x = 480/2 + 80;
+    this.m_score_position.x = 480/2 + 140;
     this.m_up = _SDLK_UP;
     this.m_down = _SDLK_DOWN;
   end;
