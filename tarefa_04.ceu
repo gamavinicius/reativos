@@ -59,36 +59,34 @@ do
   m_rect.h = 10;
   m_rect.x = 640/2 - m_rect.w/2;
   m_rect.y = 480/2 - m_rect.h/2;
-  loop do
-    par do
-      loop do //velocity up, not good solution
-        await 5000ms;
-        if m_dx > 0 then
-          m_dx = m_dx + 1;
-        else
-          m_dx = m_dx - 1;
-        end
-        if m_dy > 0 then
-          m_dy = m_dy + 1;
-        else
-          m_dy = m_dy - 1;
-        end
+  par do
+    loop do //velocity up, not good solution
+      await 5000ms;
+      if m_dx > 0 then
+        m_dx = m_dx + 1;
+      else
+        m_dx = m_dx - 1;
       end
-    with //verify score and move
-      loop do
-        await (m_dt)ms;
-        if (m_rect.y + m_rect.h) > 480 or (m_rect.y <= 0)then
-          m_dy = -m_dy;
-        end
-        m_rect.x = m_rect.x + m_dx;
-        m_rect.y = m_rect.y + m_dy;
+      if m_dy > 0 then
+        m_dy = m_dy + 1;
+      else
+        m_dy = m_dy - 1;
       end
-    with  //redesenho
-      loop do
-        await SDL_REDRAW;
-        _SDL_SetRenderDrawColor(_REN, 0x00,0x00,0x00,0x00);
-        _SDL_RenderFillRect(_REN, &m_rect);
+    end
+  with //verify score and move
+    loop do
+      await (m_dt)ms;
+      if (m_rect.y + m_rect.h) > 480 or (m_rect.y <= 0)then
+        m_dy = -m_dy;
       end
+      m_rect.x = m_rect.x + m_dx;
+      m_rect.y = m_rect.y + m_dy;
+    end
+  with  //redesenho
+    loop do
+      await SDL_REDRAW;
+      _SDL_SetRenderDrawColor(_REN, 0x00,0x00,0x00,0x00);
+      _SDL_RenderFillRect(_REN, &m_rect);
     end
   end
 end
@@ -103,14 +101,12 @@ do
   m_rect.h = 90;
   m_dy = 16;
   par do
-    loop do  //moving
-      var _SDL_KeyboardEvent* key;
-      every key in SDL_KEYDOWN do
-        if key:keysym.sym == m_up and m_rect.y > 0 then
-          m_rect.y = m_rect.y - m_dy;  
-        else/if key:keysym.sym == m_down and (m_rect.y + m_rect.h) <= 480 then
-          m_rect.y = m_rect.y + m_dy;
-        end
+    var _SDL_KeyboardEvent* key; //moving
+    every key in SDL_KEYDOWN do
+      if key:keysym.sym == m_up and m_rect.y > 0 then
+        m_rect.y = m_rect.y - m_dy;  
+      else/if key:keysym.sym == m_down and (m_rect.y + m_rect.h) <= 480 then
+        m_rect.y = m_rect.y + m_dy;
       end
     end
   with  //redraw
