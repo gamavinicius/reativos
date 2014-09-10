@@ -9,11 +9,12 @@
 ##Tarefa-03
 
 ###1. Implementar “event_driven.c”
-  - Tratador para botões
-  - 2 timers
+  - Tratador para botões.
+  - 2 timers.
+  
 ###2. Reimplementar os exemplos com orientação a eventos:
-  - Hello World: Input
-  - Tarefa 2
+  - Hello World: Input.
+  - Tarefa 2.
 
 ##Exercício - “Reiniciar”
 - Reiniciar o comportamento da “Tarefa 2” caso o Botão 1 seja pressionado por 5 segundos.
