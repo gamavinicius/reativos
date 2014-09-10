@@ -16,6 +16,6 @@ Jogador 1 utiliza as teclas 'w' e 's' para mover sua "raquete", enquanto que o J
 
 
 ##Para executar:
-cd /home/ceu/ceu-sdl
-make CEUFILE=/<path_do_jogo>/tarefa_04.ceu
-.<path_do_jogo>/tarefa_04.exe
+- cd /home/ceu/ceu-sdl
+- make CEUFILE=/"path_do_jogo"/tarefa_04.ceu
+- ."path_do_jogo"/tarefa_04.exe
