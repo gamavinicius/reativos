@@ -15,7 +15,7 @@
 #define MAX_DISTANCE 200
 #define PING_INTERVAL 33
 
-#define CAR_DISTANCE 10
+#define CAR_DISTANCE 25
 #define PARKING_LIMIT 5
 
 unsigned long ping_timer[SONAR_NUM];
@@ -37,7 +37,8 @@ void echoCheck() {
 
 void oneSensorCycle() {
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
-    if (sensor[i] < CAR_DISTANCE) {
+    //Serial.println(sensor[i]);
+    if (sensor[i] < CAR_DISTANCE && sensor[i] != 0) {
       if (car_total == PARKING_LIMIT) {
         Serial.println("Proibido de entrar");
       }
@@ -90,7 +91,7 @@ void loop ()
   uint8_t message[VW_MAX_MESSAGE_LEN];
   uint8_t msgLength = VW_MAX_MESSAGE_LEN;
 
-  if (vw_wait_rx_max(500)) { //Blocking until 500ms
+  if (vw_wait_rx_max(200)) { //Blocking until 200ms
     if (vw_get_message(message, &msgLength)) // Non-blocking
     {
       if (msgLength == 3 &&

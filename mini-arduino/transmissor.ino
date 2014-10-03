@@ -15,7 +15,7 @@
 #define MAX_DISTANCE 200
 #define PING_INTERVAL 33 // 29ms is the min.
 
-#define CAR_DISTANCE 50
+#define CAR_DISTANCE 25
 
 unsigned long ping_timer[SONAR_NUM];
 unsigned int sensor[SONAR_NUM];
@@ -34,6 +34,7 @@ void EchoCheck() {
 
 void CycleComplete() {
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
+    //Serial.println(sensor[i]);
     if (sensor[i] < CAR_DISTANCE) {
       if (!already_send[i]) {
         char message[] = "Out";
