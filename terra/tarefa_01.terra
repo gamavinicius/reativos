@@ -1,0 +1,45 @@
+#include "/home/terra/TerraNet_v0.1/terra/TerraNet.defs"
+
+pktype usrMsg from radioMsg with
+  var ubyte[4]d8;
+  var ushort[4]d16;
+  var ulong[2] d32;
+end
+
+var ushort nodeId = getNodeId();
+var usrMsg msgRadio;
+
+if nodeId == 1 then
+  loop do
+    msgRadio = await RECEIVE;
+    //do something
+    //msgRadio.d16[0]
+  end
+else/if nodeId == 11 then
+  msgRadio.source = nodeId;
+  msgRadio.target = 1;
+  loop do
+    await 2s;
+    emit REQ_TEMP();
+    msgRadio.d16[0] = await TEMP;
+    emit SEND(msgRadio);
+    await SEND_DONE;
+  end
+else  
+  par do
+    loop do
+      await 1s;
+      emit LED0(TOGGLE);
+    end
+  with
+    loop do
+      await 2s;
+      emit LED1(TOGGLE);
+    end
+  with
+    loop do
+      await 4s;
+      emit LED2(TOGGLE);
+    end
+  end
+end
