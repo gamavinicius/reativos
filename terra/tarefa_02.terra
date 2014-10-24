@@ -8,6 +8,9 @@ end
 
 var ushort nodeId = getNodeId();
 var usrMsg msgRadio;
+var ushort msg_id = 0;
+var ushort msg_id_ack = 0;
+msgRadio.d16[2] = 0;
 var ubyte stat;
 
 if nodeId == 1 then
@@ -15,16 +18,17 @@ if nodeId == 1 then
     msgRadio = await RECEIVE;
     //do something
     //msgRadio.d16[0]
-    //msgRadio.d16[3]
   end
 else
   par do
     msgRadio.source = nodeId;
     loop do
       //Get Temp and put in queue
-      await 2s;
+      await 3s;
       emit REQ_TEMP();
       msgRadio.d16[0] = await TEMP;
+      inc msg_id;
+      msgRadio.d16[2] = msg_id;
       msgRadio.d16[3] = nodeId;
       stat = qPut(msgRadio);
     end
@@ -32,13 +36,17 @@ else
     loop do
       //Receive and put in queue
       msgRadio = await RECEIVE;
-      stat = qPut(msgRadio);
+      if msgRadio.d16[2] >= msg_id_ack or msgRadio.d16[2] == 0 then
+        stat = qPut(msgRadio);
+        msg_id_ack = msgRadio.d16[2];
+      end
     end
   with
     loop do
       //Send message
       await Q_READY;
       loop do
+        var ubyte ack;
         stat = qGet(msgRadio);
         msgRadio.source = nodeId;
         if nodeId == 11 then
@@ -46,8 +54,14 @@ else
         else
           msgRadio.target = nodeId - 1;
         end
-        emit SEND(msgRadio);
-        await SEND_DONE;
+        emit SEND_ACK(msgRadio);
+        loop do
+          ack = await SEND_DONE_ACK;
+          if ack != 0 then
+            break;
+          end
+          emit SEND_ACK(msgRadio);
+        end
         if qSize() == 0 then
           break;
         end
