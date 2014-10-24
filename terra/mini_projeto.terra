@@ -8,6 +8,7 @@ end
 
 var ushort myNodeId = getNodeId();
 var ushort dadNodeId = -1;
+var ulong jump = -1;
 var ushort msgId = 0;
 var ushort msgIdAck = 0;
 var usrMsg msgRadio;
@@ -20,14 +21,18 @@ var ubyte stat;
 if myNodeId == 11 then
   await 2s;
   dadNodeId = 1;
+  jump = 1;
   msgRadio.source = myNodeId;
   msgRadio.target = BROADCAST;
   msgRadio.type = 0;
+  msgRadio.d32[0] = jump + 1;
   emit SEND(msgRadio);
   await SEND_DONE;
 else
   msgRadio = await RECEIVE(0);
   dadNodeId = msgRadio.source;
+  jump = msgRadio.d32[0];
+  msgRadio.d32[0] = jump + 1;
   msgRadio.source = myNodeId;
   msgRadio.target = BROADCAST;
   msgRadio.type = 0;
@@ -36,18 +41,19 @@ else
 end
 
 if dadNodeId != -1 then
-  emit LEDS(TOGGLE);
+  emit LED0(ON);
 end
 
 par do
   loop do
     //Get Temp and put in queue
     await 3s;
+    await (10*jump)ms;
     emit REQ_TEMP();
     msgRadio.d16[0] = await TEMP;
     msgRadio.d16[1] = myNodeId;
     msgRadio.d16[2] = msgId;
-    msgRadio.d32[0] = 0;
+    msgRadio.d32[0] = jump;
     inc msgId;
     stat = qPut(msgRadio);
   end
@@ -56,7 +62,6 @@ with
     //Receive and put in queue
     msgRadio = await RECEIVE(1);
     if msgRadio.d16[2] == 0 or msgRadio.d16[2] >= msgIdAck then
-      msgRadio.d32[0] = msgRadio.d32[0] + 1;
       stat = qPut(msgRadio);
       msgIdAck = msgRadio.d16[2];
     end
