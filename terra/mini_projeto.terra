@@ -15,7 +15,7 @@ var ulong jump = -1;
 var ubyte childNumber = 0;
 var ushort[10] childNodeId;
 var ubyte msgId = 0;
-var ushort globalMsgId = 0;
+var ushort globalMsgId = 1;
 var ushort[10] msgIdAck;
 var usrMsg msgRadio;
 
@@ -96,7 +96,7 @@ with
     loop i, childNumber do
       if childNodeId[i] == msgRadio.source then
         found = 1;
-        if msgRadio.d16[2] == 0 or msgRadio.d16[2] >= msgIdAck[i] then
+        if msgRadio.d16[2] == 0 or msgRadio.d16[2] > msgIdAck[i] then
           msgIdAck[i] = msgRadio.d16[2];
           //stat = qPut(msgRadio);
           break;
