@@ -21,3 +21,6 @@ Para o funcionamento do projeto são necessárias as seguintes bibliotecas:
 
 O arquivo 'receiver' deve ser instalado no Arduino que ficará na entrada do estacionamento.
 O arquivo 'transmissor' deve ser instaldo no Arduino que ficará na saída do estacionamento.
+
+##Video
+Link com o video do projeto https://www.dropbox.com/s/gpkgwekpympsrtv/VID_20141122_105045.mp4?dl=0
