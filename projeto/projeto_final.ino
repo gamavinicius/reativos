@@ -44,5 +44,10 @@ void loop() {
     bth_message = "";
   }
 
-  stepper.step(rotate * STEP); //blocking fuction
+  int signal = 1;
+  if (rotate < 0)
+    signal = -1;
+  stepper.setSpeed(signal * rotate * 100);
+  if (rotate != 0 )
+    stepper.step(signal * STEP); //blocking fuction
 }
