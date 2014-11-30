@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final int REQUEST_ENABLE_BT = 1;
 
-    private Button m_btn_up, m_btn_down;
+    private Button m_btn_up, m_btn_down, m_btn_stop;
 
     private BluetoothAdapter m_bth_adapter = null;
     private BluetoothSocket m_bth_socket = null;
@@ -37,6 +37,7 @@ public class MainActivity extends Activity {
 
         m_btn_up = (Button) findViewById(R.id.btn_up);
         m_btn_down = (Button) findViewById(R.id.btn_down);
+        m_btn_stop = (Button) findViewById(R.id.btn_stop);
 
         m_bth_adapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -46,11 +47,16 @@ public class MainActivity extends Activity {
                 SendMessage("1");
             }
         });
-
         m_btn_down.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SendMessage("2");
+            }
+        });
+        m_btn_stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SendMessage("3");
             }
         });
     }

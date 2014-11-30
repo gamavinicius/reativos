@@ -20,6 +20,13 @@
 
     <Button
         style="?android:attr/buttonBarButtonStyle"
+        android:id="@+id/btn_stop"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="Stop" />
+
+    <Button
+        style="?android:attr/buttonBarButtonStyle"
         android:id="@+id/btn_down"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
